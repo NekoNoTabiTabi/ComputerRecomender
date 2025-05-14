@@ -27,15 +27,6 @@ class CPUBrand(str, Enum):
     AMD = "AMD"
     NO_PREFERENCE = "No Preference"
 
-class UsageScenario(str, Enum):
-    GENERAL = "General Computing/Office"
-    GAMING_1080P = "Gaming (1080p)"
-    GAMING_1440P_4K = "Gaming (1440p/4K)"
-    CONTENT_CREATION = "Content Creation (Video/Photo Editing)"
-    STREAMING = "Streaming"
-    WORKSTATION = "Workstation (3D Rendering, CAD)"
-    SERVER = "Server/Development"
-
 class FormFactor(str, Enum):
     MINI_TOWER = "Mini Tower (Compact, limited expansion)"
     MID_TOWER = "Mid Tower (Balanced size and expandability)"
@@ -60,10 +51,7 @@ class GPUBrand(str, Enum):
     AMD = "AMD"
     NO_PREFERENCE = "No Preference"
 
-class RGBPreference(str, Enum):
-    YES = "Yes"
-    NO = "No"
-    NO_PREFERENCE = "No Preference"
+
 
 class PSUTier(str, Enum):
     BRONZE = "80+ Bronze"
@@ -76,15 +64,11 @@ class PSUTier(str, Enum):
 class RecommendationRequest(BaseModel):
     preferred_cpu: Optional[CPUBrand] = CPUBrand.NO_PREFERENCE
     cpu_model: Optional[str] = None
-    usage: Optional[UsageScenario] = UsageScenario.GENERAL
     form_factor: Optional[FormFactor] = FormFactor.NO_PREFERENCE
     cooling: Optional[CoolingSolution] = CoolingSolution.NO_PREFERENCE
     storage: Optional[str] = None
-    budget_min: Optional[int] = 30000
-    budget_max: Optional[int] = 80000
     ram_pref: Optional[MemoryCapacity] = MemoryCapacity.NO_PREFERENCE
     gpu_pref: Optional[GPUBrand] = GPUBrand.NO_PREFERENCE
-    rgb_pref: Optional[RGBPreference] = RGBPreference.NO_PREFERENCE
     psu_pref: Optional[PSUTier] = PSUTier.NO_PREFERENCE
 
 
@@ -147,16 +131,6 @@ def get_compatible_motherboard_chipsets(cpu_brand: str, cpu_tier: str) -> List[s
     return []
 
 
-# Get SQL condition for form factor preference
-def get_form_factor_condition(form_factor: FormFactor) -> Optional[str]:
-    if form_factor == FormFactor.MINI_TOWER:
-        return "form_factor IN ('Mini Tower', 'Micro ATX', 'Mini-ITX')"
-    elif form_factor == FormFactor.MID_TOWER:
-        return "form_factor = 'ATX'"
-    elif form_factor == FormFactor.FULL_TOWER:
-        return "form_factor IN ('E-ATX', 'Full Tower')"
-    return None
-
 
 # Function to fetch components from DB with conditions
 def fetch_components(db, component_type: str, conditions: List[str] = None, params: List = None) -> List[dict]:
@@ -198,28 +172,126 @@ async def get_recommendation(request: RecommendationRequest):
         cpu_brand = request.preferred_cpu.value if request.preferred_cpu != CPUBrand.NO_PREFERENCE else None
         cpu_tier, performance_tier = get_cpu_tier_requirements(request.cpu_model)
         
-        # Fetch compatible components
-        # CPU, motherboard, RAM, GPU, etc.
-        # Note: Add more fetching logic as required based on other components
+         # Determine CPU requirements
+        cpu_brand = request.preferred_cpu.value if request.preferred_cpu != CPUBrand.NO_PREFERENCE else None
+        cpu_tier, performance_tier = get_cpu_tier_requirements(request.cpu_model)
         
-        # Example CPU selection:
+        # 1. Fetch CPU
         cpu_conditions = []
+        cpu_params = []
         if cpu_brand:
             cpu_conditions.append("(name LIKE ? OR name LIKE ?)")
-            params = [f"%{cpu_brand}%", f"%{cpu_brand.lower()}%"]
-        
+            cpu_params.extend([f"%{cpu_brand}%", f"%{cpu_brand.lower()}%"])
         if cpu_tier:
             cpu_conditions.append("name LIKE ?")
-            params.append(f"%{cpu_tier}%")
+            cpu_params.append(f"%{cpu_tier}%")
         
-        cpus = fetch_components(db, "CPU", cpu_conditions, params)
+        cpus = fetch_components(db, "CPU", cpu_conditions, cpu_params)
         if not cpus:
             raise HTTPException(status_code=404, detail="No suitable CPU found.")
-        
         selected_cpu = cpus[0]
-        # Similar selection for other components follows...
+        
+        # 2. Fetch Motherboard (based on CPU)
+        mobo_conditions = []
+        mobo_params = []
+        
+        # Get compatible chipsets
+        if cpu_brand and cpu_tier:
+            compatible_chipsets = get_compatible_motherboard_chipsets(cpu_brand, cpu_tier)
+            if compatible_chipsets:
+                placeholders = ",".join(["?"] * len(compatible_chipsets))
+                mobo_conditions.append(f"chipset IN ({placeholders})")
+                mobo_params.extend(compatible_chipsets)
+        
+        motherboards = fetch_components(db, "Motherboard", mobo_conditions, mobo_params)
+        if not motherboards:
+            raise HTTPException(status_code=404, detail="No suitable motherboard found.")
+        selected_motherboard = motherboards[0]
+        
+        # 3. Fetch RAM
+        ram_conditions = []
+        ram_params = []
+        
+        if request.ram_pref != MemoryCapacity.NO_PREFERENCE:
+            capacity_map = {
+                MemoryCapacity.GB8: 8,
+                MemoryCapacity.GB16: 16,
+                MemoryCapacity.GB32: 32,
+                MemoryCapacity.GB64: 64
+            }
+            ram_conditions.append("capacity >= ?")
+            ram_params.append(capacity_map[request.ram_pref])
+        
+        rams = fetch_components(db, "RAM", ram_conditions, ram_params)
+        if not rams:
+            raise HTTPException(status_code=404, detail="No suitable RAM found.")
+        selected_ram = rams[0]
+        
+        # 4. Fetch GPU
+        gpu_conditions = []
+        gpu_params = []
+        
+        if request.gpu_pref != GPUBrand.NO_PREFERENCE:
+            gpu_conditions.append("(name LIKE ? OR name LIKE ?)")
+            gpu_params.extend([f"%{request.gpu_pref.value}%", f"%{request.gpu_pref.value.lower()}%"])
+        
+        # Match GPU tier with CPU tier
+        if performance_tier:
+            gpu_conditions.append("tier = ?")
+            gpu_params.append(performance_tier)
+        
+        gpus = fetch_components(db, "GPU", gpu_conditions, gpu_params)
+        if not gpus:
+            raise HTTPException(status_code=404, detail="No suitable GPU found.")
+        selected_gpu = gpus[0]
+        
+        # 8. Fetch Cooler (if needed)
+        cooler_conditions = []
+        cooler_params = []
+        
+        if request.cooling != CoolingSolution.NO_PREFERENCE:
+            if request.cooling == CoolingSolution.AIR:
+                cooler_conditions.append("type = 'Air'")
+            elif request.cooling == CoolingSolution.LIQUID:
+                cooler_conditions.append("type = 'Liquid'")
+            elif request.cooling == CoolingSolution.STOCK:
+                # No need for aftermarket cooler
+                selected_cooler = None
+        
+        if cooler_conditions:
+            # Ensure compatibility with socket
+            if selected_cpu.get('socket'):
+                cooler_conditions.append("compatible_sockets LIKE ?")
+                cooler_params.append(f"%{selected_cpu['socket']}%")
+            
+            coolers = fetch_components(db, "Cooler", cooler_conditions, cooler_params)
+            if coolers:
+                selected_cooler = coolers[0]
+            else:
+                selected_cooler = None
+        else:
+            selected_cooler = None
+        
+        # Prepare the response
+        recommended_build = {
+            "CPU": selected_cpu,
+            "Motherboard": selected_motherboard,
+            "RAM": selected_ram,
+            "GPU": selected_gpu,
 
-        return {"recommended_build": "Example build details go here"}
+            
+#-------------------need differentr fetch method or sql query   ------
+           # "Storage": selected_storage,
+            #"PSU": selected_psu,
+           # "Case": selected_case,
+#-------------------need differentr fetch method or sql query <End> ------
+
+
+            "Cooler": selected_cooler if selected_cooler else "Using stock cooler"
+        }
+        
+        return {"recommended_build": recommended_build}
+        
     except Exception as e:
         print(f"Error: {e}")
         import traceback
