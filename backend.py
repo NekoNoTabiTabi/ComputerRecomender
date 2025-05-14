@@ -246,31 +246,7 @@ async def get_recommendation(request: RecommendationRequest):
         selected_gpu = gpus[0]
         
         # 8. Fetch Cooler (if needed)
-        cooler_conditions = []
-        cooler_params = []
-        
-        if request.cooling != CoolingSolution.NO_PREFERENCE:
-            if request.cooling == CoolingSolution.AIR:
-                cooler_conditions.append("type = 'Air'")
-            elif request.cooling == CoolingSolution.LIQUID:
-                cooler_conditions.append("type = 'Liquid'")
-            elif request.cooling == CoolingSolution.STOCK:
-                # No need for aftermarket cooler
-                selected_cooler = None
-        
-        if cooler_conditions:
-            # Ensure compatibility with socket
-            if selected_cpu.get('socket'):
-                cooler_conditions.append("compatible_sockets LIKE ?")
-                cooler_params.append(f"%{selected_cpu['socket']}%")
-            
-            coolers = fetch_components(db, "Cooler", cooler_conditions, cooler_params)
-            if coolers:
-                selected_cooler = coolers[0]
-            else:
-                selected_cooler = None
-        else:
-            selected_cooler = None
+       
         
         # Prepare the response
         recommended_build = {
@@ -284,10 +260,7 @@ async def get_recommendation(request: RecommendationRequest):
            # "Storage": selected_storage,
             #"PSU": selected_psu,
            # "Case": selected_case,
-#-------------------need differentr fetch method or sql query <End> ------
-
-
-            "Cooler": selected_cooler if selected_cooler else "Using stock cooler"
+            #"Cooler": selected_cooler if selected_cooler else "Using stock cooler"
         }
         
         return {"recommended_build": recommended_build}
