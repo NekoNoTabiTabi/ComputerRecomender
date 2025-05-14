@@ -164,21 +164,27 @@ def fetch_components(db, component_type: str, conditions: List[str] = None, para
         params = []
     if conditions is None:
         conditions = []
-    
-    query = f"SELECT * FROM components WHERE type = ?"
+
+    # Base query for fetching components
+    query = f"SELECT * FROM components WHERE component_type = ?"
     params.insert(0, component_type)
-    
+
     if conditions:
         query += " AND " + " AND ".join(conditions)
-    
-    query += " ORDER BY price_estimate DESC"
-    
+
+    query += " ORDER BY id ASC"  # Adjust sorting if needed
+
+    # Debugging: Log the query and parameters
+    print(f"Executing query: {query}")
+    print(f"With parameters: {params}")
+
     try:
         cursor = db.execute(query, params)
-        return cursor.fetchall()
+        results = [dict(row) for row in cursor.fetchall()]
+        print(f"Fetched {len(results)} results.")
+        return results
     except sqlite3.Error as e:
         raise HTTPException(status_code=501, detail=f"DB query error: {e}")
-
 
 # Endpoint for recommending a build based on user input
 @app.post("/recommend")

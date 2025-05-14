@@ -10,6 +10,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+
+#-----------Functions to display components----------------------------------------------------------------------------
 def display_core_components(build):
    st.markdown("#### Core Components")
    st.markdown(f"""
@@ -31,6 +33,11 @@ def display_supporting_components(build):
                                         <p><strong>🧊 Cooling:</strong> {build.get('cooling', 'N/A')} <span class="component-price">₱{component_prices.get('cooling', 0):,.2f}</span></p>
                                     </div>
                                 """, unsafe_allow_html=True)
+#-----------Functions to display components <end>-----------------------------------------------------------------------
+
+
+
+#-----------------------------code for displaying the Page--------------------------------------------------------
 
 # Custom CSS for better styling
 st.markdown("""
@@ -198,14 +205,17 @@ with tab1:
                 "gpu_pref": gpu_pref,
                 "psu_pref": psu_pref
             }
+#-----------------------------code for displaying thec Main Page <End>--------------------------------------------------------
 
+#------------------------------code for displaying the recommended Build------------------------------------------
             with st.spinner("Finding the perfect components for your build..."):
+                
+                
                 try:
                     res = requests.post("http://localhost:8001/recommend", json = user_input)
 
                     if res.status_code == 200:
                         data = res.json()
-
                         if "recommended_build" in data:
                             build = data["recommended_build"]
                             component_prices = data.get("component_prices", {})
@@ -243,6 +253,8 @@ with tab1:
                         st.error(f"Failed to get recommendation. Status code: {res.status_code} ")
                 except Exception as e:
                     st.error(f"Error connecting to the recommendation service: {str(e)}")
+
+#------------------------------code for displaying the recommended Build------------------------------------------
 
 with tab2:
     st.markdown("""
