@@ -10,6 +10,28 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+def display_core_components(build):
+   st.markdown("#### Core Components")
+   st.markdown(f"""
+                                    <div class="recommendation-card">
+                                        <p><strong>💻 CPU:</strong> {build.get('cpu', 'N/A')} <span class="component-price">₱{component_prices.get('cpu', 0):,.2f}</span></p>
+                                        <p><strong>🎮 GPU:</strong> {build.get('gpu', 'N/A')} <span class="component-price">₱{component_prices.get('gpu', 0):,.2f}</span></p>
+                                        <p><strong>🧠 RAM:</strong> {build.get('ram', 'N/A')} <span class="component-price">₱{component_prices.get('ram', 0):,.2f}</span></p>
+                                        <p><strong>💾 Storage:</strong> {build.get('storage', 'N/A')} <span class="component-price">₱{component_prices.get('storage', 0):,.2f}</span></p>
+                                    </div>
+                                """, unsafe_allow_html=True)
+
+def display_supporting_components(build):
+  st.markdown("#### Supporting Components")
+  st.markdown(f"""
+                                    <div class="recommendation-card">
+                                        <p><strong>🧩 Motherboard:</strong> {build.get('motherboard', 'N/A')} <span class="component-price">₱{component_prices.get('motherboard', 0):,.2f}</span></p>
+                                        <p><strong>🔌 PSU:</strong> {build.get('psu', 'N/A')} <span class="component-price">₱{component_prices.get('psu', 0):,.2f}</span></p>
+                                        <p><strong>🏢 Case:</strong> {build.get('case', 'N/A')} <span class="component-price">₱{component_prices.get('case', 0):,.2f}</span></p>
+                                        <p><strong>🧊 Cooling:</strong> {build.get('cooling', 'N/A')} <span class="component-price">₱{component_prices.get('cooling', 0):,.2f}</span></p>
+                                    </div>
+                                """, unsafe_allow_html=True)
+
 # Custom CSS for better styling
 st.markdown("""
     <style>
@@ -179,7 +201,7 @@ with tab1:
 
             with st.spinner("Finding the perfect components for your build..."):
                 try:
-                    res = requests.post("http://localhost:8000/recommend", json=user_input)
+                    res = requests.post("http://localhost:8000/recommend", json = user_input)
 
                     if res.status_code == 200:
                         data = res.json()
@@ -194,26 +216,11 @@ with tab1:
                             col1, col2 = st.columns(2)
 
                             with col1:
-                                st.markdown("#### Core Components")
-                                st.markdown(f"""
-                                    <div class="recommendation-card">
-                                        <p><strong>💻 CPU:</strong> {build.get('cpu', 'N/A')} <span class="component-price">₱{component_prices.get('cpu', 0):,.2f}</span></p>
-                                        <p><strong>🎮 GPU:</strong> {build.get('gpu', 'N/A')} <span class="component-price">₱{component_prices.get('gpu', 0):,.2f}</span></p>
-                                        <p><strong>🧠 RAM:</strong> {build.get('ram', 'N/A')} <span class="component-price">₱{component_prices.get('ram', 0):,.2f}</span></p>
-                                        <p><strong>💾 Storage:</strong> {build.get('storage', 'N/A')} <span class="component-price">₱{component_prices.get('storage', 0):,.2f}</span></p>
-                                    </div>
-                                """, unsafe_allow_html=True)
+                                
+                                display_core_components(build)
 
-                            with col2:
-                                st.markdown("#### Supporting Components")
-                                st.markdown(f"""
-                                    <div class="recommendation-card">
-                                        <p><strong>🧩 Motherboard:</strong> {build.get('motherboard', 'N/A')} <span class="component-price">₱{component_prices.get('motherboard', 0):,.2f}</span></p>
-                                        <p><strong>🔌 PSU:</strong> {build.get('psu', 'N/A')} <span class="component-price">₱{component_prices.get('psu', 0):,.2f}</span></p>
-                                        <p><strong>🏢 Case:</strong> {build.get('case', 'N/A')} <span class="component-price">₱{component_prices.get('case', 0):,.2f}</span></p>
-                                        <p><strong>🧊 Cooling:</strong> {build.get('cooling', 'N/A')} <span class="component-price">₱{component_prices.get('cooling', 0):,.2f}</span></p>
-                                    </div>
-                                """, unsafe_allow_html=True)
+                            with col2:                                
+                                display_supporting_components(build)
 
                             st.markdown(f"""
                                 <div style="margin-top: 2rem;">
@@ -233,7 +240,7 @@ with tab1:
                         else:
                             st.warning(data.get("message", "No recommendation available for your criteria."))
                     else:
-                        st.error(f"Failed to get recommendation. Status code: {res.status_code}")
+                        st.error(f"Failed to get recommendation. Status code: {res.status_code} ")
                 except Exception as e:
                     st.error(f"Error connecting to the recommendation service: {str(e)}")
 
