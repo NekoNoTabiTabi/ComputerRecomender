@@ -12,7 +12,7 @@ st.set_page_config(
 
 
 #-----------Functions to display components----------------------------------------------------------------------------
-def display_core_components(build):
+def display_core_components(build, component_prices):
    st.markdown("#### Core Components")
    st.markdown(f"""
                                     <div class="recommendation-card">
@@ -23,7 +23,7 @@ def display_core_components(build):
                                     </div>
                                 """, unsafe_allow_html=True)
 
-def display_supporting_components(build):
+def display_supporting_components(build, component_prices):
   st.markdown("#### Supporting Components")
   st.markdown(f"""
                                     <div class="recommendation-card">
@@ -227,10 +227,10 @@ with tab1:
 
                             with col1:
                                 
-                                display_core_components(build)
+                                display_core_components(build, component_prices)
 
                             with col2:                                
-                                display_supporting_components(build)
+                                display_supporting_components(build, component_prices)
 
                             st.markdown(f"""
                                 <div style="margin-top: 2rem;">
