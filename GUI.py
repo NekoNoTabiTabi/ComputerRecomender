@@ -201,7 +201,7 @@ with tab1:
 
             with st.spinner("Finding the perfect components for your build..."):
                 try:
-                    res = requests.post("http://localhost:8000/recommend", json = user_input)
+                    res = requests.post("http://localhost:8001/recommend", json = user_input)
 
                     if res.status_code == 200:
                         data = res.json()

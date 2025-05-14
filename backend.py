@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import sqlite3
 from pathlib import Path
 from typing import Optional, List
@@ -70,6 +71,7 @@ class PSUTier(str, Enum):
     PLATINUM = "80+ Platinum"
     NO_PREFERENCE = "No Preference"
 
+
 # Request model for recommendations
 class RecommendationRequest(BaseModel):
     preferred_cpu: Optional[CPUBrand] = CPUBrand.NO_PREFERENCE
@@ -85,6 +87,7 @@ class RecommendationRequest(BaseModel):
     rgb_pref: Optional[RGBPreference] = RGBPreference.NO_PREFERENCE
     psu_pref: Optional[PSUTier] = PSUTier.NO_PREFERENCE
 
+
 # Utility function to establish DB connection
 def get_db_connection():
     try:
@@ -92,7 +95,8 @@ def get_db_connection():
         conn.row_factory = sqlite3.Row
         return conn
     except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"DB connection error: {e}")
+        raise HTTPException(status_code=500, detail=f"DB connection error on {DATABASE_URL}: {e}")
+
 
 # Function to determine CPU tier based on the model name
 def get_cpu_tier_requirements(cpu_model: str) -> tuple:
@@ -127,6 +131,7 @@ def get_cpu_tier_requirements(cpu_model: str) -> tuple:
     
     return None, None
 
+
 # Fetch compatible motherboards based on CPU brand and tier
 def get_compatible_motherboard_chipsets(cpu_brand: str, cpu_tier: str) -> List[str]:
     if cpu_brand == "Intel":
@@ -141,6 +146,7 @@ def get_compatible_motherboard_chipsets(cpu_brand: str, cpu_tier: str) -> List[s
             return ["B650", "B650E", "X670", "X670E"]
     return []
 
+
 # Get SQL condition for form factor preference
 def get_form_factor_condition(form_factor: FormFactor) -> Optional[str]:
     if form_factor == FormFactor.MINI_TOWER:
@@ -150,6 +156,7 @@ def get_form_factor_condition(form_factor: FormFactor) -> Optional[str]:
     elif form_factor == FormFactor.FULL_TOWER:
         return "form_factor IN ('E-ATX', 'Full Tower')"
     return None
+
 
 # Function to fetch components from DB with conditions
 def fetch_components(db, component_type: str, conditions: List[str] = None, params: List = None) -> List[dict]:
@@ -172,34 +179,55 @@ def fetch_components(db, component_type: str, conditions: List[str] = None, para
     except sqlite3.Error as e:
         raise HTTPException(status_code=501, detail=f"DB query error: {e}")
 
+
 # Endpoint for recommending a build based on user input
 @app.post("/recommend")
 async def get_recommendation(request: RecommendationRequest):
-    db = get_db_connection()
-    
-    # Determine CPU requirements
-    cpu_brand = request.preferred_cpu.value if request.preferred_cpu != CPUBrand.NO_PREFERENCE else None
-    cpu_tier, performance_tier = get_cpu_tier_requirements(request.cpu_model)
-    
-    # Fetch compatible components
-    # CPU, motherboard, RAM, GPU, etc.
-    # Note: Add more fetching logic as required based on other components
-    
-    # Example CPU selection:
-    cpu_conditions = []
-    if cpu_brand:
-        cpu_conditions.append("(name LIKE ? OR name LIKE ?)")
-        params = [f"%{cpu_brand}%", f"%{cpu_brand.lower()}%"]
-    
-    if cpu_tier:
-        cpu_conditions.append("name LIKE ?")
-        params.append(f"%{cpu_tier}%")
-    
-    cpus = fetch_components(db, "CPU", cpu_conditions, params)
-    if not cpus:
-        raise HTTPException(status_code=404, detail="No suitable CPU found.")
-    
-    selected_cpu = cpus[0]
-    # Similar selection for other components follows...
 
-    return {"recommended_build": "Example build details go here"}
+    try:
+        db = get_db_connection()
+        print(RecommendationRequest)
+        
+        # Determine CPU requirements
+        cpu_brand = request.preferred_cpu.value if request.preferred_cpu != CPUBrand.NO_PREFERENCE else None
+        cpu_tier, performance_tier = get_cpu_tier_requirements(request.cpu_model)
+        
+        # Fetch compatible components
+        # CPU, motherboard, RAM, GPU, etc.
+        # Note: Add more fetching logic as required based on other components
+        
+        # Example CPU selection:
+        cpu_conditions = []
+        if cpu_brand:
+            cpu_conditions.append("(name LIKE ? OR name LIKE ?)")
+            params = [f"%{cpu_brand}%", f"%{cpu_brand.lower()}%"]
+        
+        if cpu_tier:
+            cpu_conditions.append("name LIKE ?")
+            params.append(f"%{cpu_tier}%")
+        
+        cpus = fetch_components(db, "CPU", cpu_conditions, params)
+        if not cpus:
+            raise HTTPException(status_code=404, detail="No suitable CPU found.")
+        
+        selected_cpu = cpus[0]
+        # Similar selection for other components follows...
+
+        return {"recommended_build": "Example build details go here"}
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+
+# Root endpoint to validate API is running
+@app.get("/")
+def root():
+    return {"message": "PC Builder API is running. Use /recommend endpoint for recommendations."}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
