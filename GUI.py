@@ -13,13 +13,14 @@ st.set_page_config(
 
 #-----------Functions to display components----------------------------------------------------------------------------
 def display_core_components(build, component_prices):
+   
    st.markdown("#### Core Components")
-   st.markdown(f"""
+   st.markdown(f"""    
                                     <div class="recommendation-card">
-                                        <p><strong>💻 CPU:</strong> {build.get('cpu', 'N/A')} <span class="component-price">₱{component_prices.get('cpu', 0):,.2f}</span></p>
-                                        <p><strong>🎮 GPU:</strong> {build.get('gpu', 'N/A')} <span class="component-price">₱{component_prices.get('gpu', 0):,.2f}</span></p>
-                                        <p><strong>🧠 RAM:</strong> {build.get('ram', 'N/A')} <span class="component-price">₱{component_prices.get('ram', 0):,.2f}</span></p>
-                                        <p><strong>💾 Storage:</strong> {build.get('storage', 'N/A')} <span class="component-price">₱{component_prices.get('storage', 0):,.2f}</span></p>
+                                        <p><strong>💻 CPU:</strong> {build.get("CPU", {}).get("name", "No CPU found")} <span class="component-price">₱{component_prices.get('cpu', 0):,.2f}</span></p>
+                                        <p><strong>🎮 GPU:</strong> {build.get("GPU", {}).get("name", "No GPU found")} <span class="component-price">₱{component_prices.get('gpu', 0):,.2f}</span></p>
+                                        <p><strong>🧠 RAM:</strong> {build.get("RAM", {}).get("name", "No RAM found")} <span class="component-price">₱{component_prices.get('ram', 0):,.2f}</span></p>
+                                        <p><strong>💾 Storage:</strong> {build.get('storage')} <span class="component-price">₱{component_prices.get('storage', 0):,.2f}</span></p>
                                     </div>
                                 """, unsafe_allow_html=True)
 
@@ -27,10 +28,10 @@ def display_supporting_components(build, component_prices):
   st.markdown("#### Supporting Components")
   st.markdown(f"""
                                     <div class="recommendation-card">
-                                        <p><strong>🧩 Motherboard:</strong> {build.get('motherboard', 'N/A')} <span class="component-price">₱{component_prices.get('motherboard', 0):,.2f}</span></p>
-                                        <p><strong>🔌 PSU:</strong> {build.get('psu', 'N/A')} <span class="component-price">₱{component_prices.get('psu', 0):,.2f}</span></p>
-                                        <p><strong>🏢 Case:</strong> {build.get('case', 'N/A')} <span class="component-price">₱{component_prices.get('case', 0):,.2f}</span></p>
-                                        <p><strong>🧊 Cooling:</strong> {build.get('cooling', 'N/A')} <span class="component-price">₱{component_prices.get('cooling', 0):,.2f}</span></p>
+                                        <p><strong>🧩 Motherboard:</strong> {build.get('motherboard')} <span class="component-price">₱{component_prices.get('motherboard', 0):,.2f}</span></p>
+                                        <p><strong>🔌 PSU:</strong> {build.get('psu')} <span class="component-price">₱{component_prices.get('psu', 0):,.2f}</span></p>
+                                        <p><strong>🏢 Case:</strong> {build.get('case')} <span class="component-price">₱{component_prices.get('case', 0):,.2f}</span></p>
+                                        <p><strong>🧊 Cooling:</strong> {build.get('cooling')} <span class="component-price">₱{component_prices.get('cooling', 0):,.2f}</span></p>
                                     </div>
                                 """, unsafe_allow_html=True)
 #-----------Functions to display components <end>-----------------------------------------------------------------------
@@ -217,6 +218,7 @@ with tab1:
                     if res.status_code == 200:
                         data = res.json()
                         if "recommended_build" in data:
+                            
                             build = data["recommended_build"]
                             component_prices = data.get("component_prices", {})
                             total_price = data.get("total_price", 0)
