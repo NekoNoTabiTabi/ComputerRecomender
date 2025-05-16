@@ -6,8 +6,6 @@ CREATE TABLE cpus (
     name VARCHAR(255),
     socket_type VARCHAR(50),
     price INT,
-    min_price INT,
-    max_price INT,
     integrated_graphics BOOLEAN,
     stock_cooler BOOLEAN
 );
@@ -91,17 +89,17 @@ INSERT INTO case_sizes (case_size) VALUES
 ('No Preference');
 
 -- 11. Example CPU entries
-INSERT INTO cpus (brand, series, name, socket_type, price, min_price, max_price, integrated_graphics, stock_cooler) VALUES
-('Intel', 'i3', 'Intel Core i3-12100', 'LGA1700', 8000, 8000, 9500, 1, 1),
-('Intel', 'i5', 'Intel Core i5-13600K', 'LGA1700', 28000, 28000, 35000, 1, 0),
-('Intel', 'i9', 'Intel Core i9-13900K', 'LGA1700', 43000, 43000, 48000, 1, 0),
-('AMD', 'Ryzen 5', 'AMD Ryzen 5 7600X', 'AM5', 17000, 17000, 20000, 1, 0),
-('AMD', 'Ryzen 9', 'AMD Ryzen 9 7950X', 'AM5', 55000, 55000, 60000, 0, 0);
+INSERT INTO cpus (brand, series, name, socket_type, price,integrated_graphics, stock_cooler) VALUES
+('Intel', 'i3', 'Intel Core i3-12100', 'LGA1700', 8000, 1, 1),
+('Intel', 'i5', 'Intel Core i5-13600K', 'LGA1700', 28000,  1, 0),
+('Intel', 'i9', 'Intel Core i9-13900K', 'LGA1700', 43000,  1, 0),
+('AMD', 'Ryzen 5', 'AMD Ryzen 5 7600X', 'AM5', 17000, 1, 0),
+('AMD', 'Ryzen 9', 'AMD Ryzen 9 7950X', 'AM5', 55000, 0, 0);
 
 -- 12. Insert AMD CPUs (example)
 INSERT INTO cpus (brand, series, name, socket_type, price, min_price, max_price, integrated_graphics, stock_cooler) VALUES
-('AMD', 'Ryzen 3', 'AMD Ryzen 3 7300X', 'AM5', 9500, 9500, 12000, 0, 0),
-('AMD', 'Ryzen 7', 'AMD Ryzen 7 7800X3D', 'AM5', 30000, 30000, 35000, 0, 0);
+('AMD', 'Ryzen 3', 'AMD Ryzen 3 7300X', 'AM5', 9500, 0, 0),
+('AMD', 'Ryzen 7', 'AMD Ryzen 7 7800X3D', 'AM5', 30000, 0, 0);
 
 -- 13. Insert motherboards (example)
 INSERT INTO motherboards (name, socket_type, form_factor, price, case_size_id) VALUES

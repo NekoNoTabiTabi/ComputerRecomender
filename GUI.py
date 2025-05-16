@@ -101,6 +101,14 @@ with tab1:
 
         # Display guide based on CPU brand preference
         if preferred_cpu == "AMD":
+            amd_values = ["Ryzen 3", "Ryzen 5", "Ryzen 7", "Ryzen 9"]
+            
+            amd_labels = [
+             "Ryzen 3 (₱15,000 - ₱25,000)",
+             "Ryzen 5 (₱25,000 - ₱45,000)",
+             "Ryzen 7 (₱45,000 - ₱75,000)",
+             "Ryzen 9 (₱75,000 and above)"
+                         ]
             st.markdown("""
             **AMD Series Guide:**
             - **Ryzen 3**: Budget (General use, light gaming)
@@ -109,6 +117,11 @@ with tab1:
             - **Ryzen 9**: Enthusiast (Workstations, high-end gaming)
             """)
         elif preferred_cpu == "Intel":
+
+            intel_values= ["i3", "i5", "i7","i9"]
+
+            intel_labels=["Intel i3  (₱15,000 - ₱25,000)", "Intel i5 (₱25,000 - ₱45,000)", "Intel i7 (₱45,000 - ₱75,000)", "Intel i9 (₱75,000 and above)"]
+
             st.markdown("""
             **Intel Series Guide:**
             - **i3**: Budget (General use, office work)
@@ -119,54 +132,65 @@ with tab1:
 
         # Display series selection as multiple choice based on preferred CPU
         if preferred_cpu == "AMD":
-            amd_series = st.radio(
-                "**📌 Select AMD Series**",
-                ["Ryzen 3 (₱15,000 - ₱25,000)", "Ryzen 5 (₱25,000 - ₱45,000)", "Ryzen 7 (₱45,000 - ₱75,000)", "Ryzen 9 (₱75,000 and above)"],
-                help="Choose the AMD series you are interested in."
-            )
+            selected_amd = st.radio(
+             "**:pushpin: Select AMD Series**",
+             options=amd_values,
+             format_func=lambda x: amd_labels[amd_values.index(x)],
+             help="Choose the AMD series you are interested in."
+             )
         elif preferred_cpu == "Intel":
             intel_series = st.radio(
                 "**📌 Select Intel Series**",
-                ["Intel i3  (₱15,000 - ₱25,000)", "Intel i5 (₱25,000 - ₱45,000)", "Intel i7 (₱45,000 - ₱75,000)", "Intel i9 (₱75,000 and above)"],
-                help="Choose the Intel series you are interested in."
+             options = intel_values,
+             format_func = lambda x: intel_labels[intel_values.index(x)],
+             help="Choose the Intel series you are interested in."
             )
 
     with col2:
-        form_factor = st.radio(
-            "**📏 Case Size Preference**",
-            [
-                "Select size",
+        case_values= [ "mini", "mid", "full"]
+        case_labels=[
                 "Mini Tower (Compact, limited expansion)",
                 "Mid Tower (Balanced size and expandability)",
                 "Full Tower (Maximum expansion, better cooling)",
-                "No Preference"
-            ],
-            index=0,
-            help="Larger cases offer better cooling and expansion"
+            ]
+        case_size = st.radio(
+            
+           
+            "**📏 Case Size Preference**",
+             options = case_values,
+             format_func = lambda x: case_labels[case_values.index(x)],
+             index=0,
+              help="Larger cases offer better cooling and expansion"           
         )
-
-        cooling = st.radio(
-            "**🧊 Cooling Solution**",
-            [
+        
+        
+        cooling_values=["Stock", "Air", "Liquid"]
+        cooling_labels= [
                 "Stock Cooler (Included with CPU)",
                 "Air Cooling (Quiet, reliable)",
-                "Liquid Cooling (Better performance, aesthetic)",
-                "No Preference"
-            ],
-            index=None,
-            horizontal=True
+                "Liquid Cooling (Better performance, aesthetic)"        
+            ]
+        cooling = st.radio(
+            "**🧊 Cooling Solution**",
+             options = cooling_values,
+             format_func = lambda x: cooling_labels[cooling_values.index(x)],
+             index=0,
+            
+            
         )
-
-        storage = st.radio(
-            "**💾 Storage Configuration**",
-            [
-                "Select storage",
+        storage_values=["256GB","512GB","1TB","2TB"]
+        storage_labels=[             
                 "256GB SSD (Basic use)",
                 "512GB SSD (Moderate use)",
                 "1TB SSD (Gaming, general use)",
-                "2TB SSD (Content creators)",
-            ],
-            index=0
+                "2TB SSD (Content creators)"
+                   ]
+        storage = st.radio(
+            "**💾 Storage Configuration**",
+            options = storage_values,
+             format_func = lambda x: storage_labels[storage_values.index(x)],
+             index=0,
+            
         )
 
 
@@ -174,32 +198,35 @@ with tab1:
         adv_col1, adv_col2 = st.columns(2)
 
         with adv_col1:
+            ram_values=["8GB","16GB","32GB", "64GB+"]
+            ram_labels=  ["8GB", "16GB", "32GB", "64GB+"]
             ram_pref = st.selectbox(
                 "Memory Capacity",
-                ["8GB", "16GB", "32GB", "64GB+", "No Preference"],
-                index=4
+                options = ram_values,
+                format_func = lambda x: ram_labels[ram_values.index(x)],              
+                index=0
             )
 
             gpu_pref = st.radio(
                 "GPU Brand Preference",
-                ["NVIDIA", "AMD", "No Preference"],
-                index=2
+                ["NVIDIA", "AMD"],
+                index=0
             )
 
             psu_pref = st.selectbox(
                 "Power Supply Certification",
-                ["80+ Bronze", "80+ Gold", "80+ Platinum", "No Preference"],
-                index=3
+                ["80+ Bronze", "80+ Gold", "80+ Platinum"],
+                index=0
             )
 
     if st.button("**🎯 Get My PC Recommendation**", use_container_width=True):
-        if not preferred_cpu or (preferred_cpu == "AMD" and not amd_series) or (preferred_cpu == "Intel" and not intel_series) or form_factor == "Select size" or storage == "Select storage":
-            st.warning("Please fill in all required fields before submitting.")
-        else:
+            if not preferred_cpu:
+             st.warning("please pick CPU")
+             
             user_input = {
                 "preferred_cpu": preferred_cpu,
-                "series": amd_series if preferred_cpu == "AMD" else intel_series,
-                "form_factor": form_factor,
+                "cpu_model": selected_amd if preferred_cpu == "AMD" else intel_series,
+                "case_size": case_size,
                 "cooling": cooling,
                 "storage": storage,
                 "ram_pref": ram_pref,
