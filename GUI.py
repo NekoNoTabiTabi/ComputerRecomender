@@ -5,7 +5,7 @@ from PIL import Image
 # Configure page
 st.set_page_config(
     page_title="PC Build Recommender",
-    page_icon="🖥️",
+    page_icon="./LOGO.jpg",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -147,7 +147,7 @@ with tab1:
             )
 
     with col2:
-        case_values= [ "mini", "mid", "full"]
+        case_values= [ "Mini Tower", "Mid Tower" , "Full Tower"]
         case_labels=[
                 "Mini Tower (Compact, limited expansion)",
                 "Mid Tower (Balanced size and expandability)",
@@ -240,13 +240,13 @@ with tab1:
                 
                 
                 try:
-                    res = requests.post("http://localhost:8001/recommend", json = user_input)
+                    res = requests.post("http://localhost:8001/user_input", json = user_input)
 
                     if res.status_code == 200:
                         data = res.json()
-                        if "recommended_build" in data:
+                        if "input" in data:
                             
-                            build = data["recommended_build"]
+                            build = data["input"]
                             component_prices = data.get("component_prices", {})
                             total_price = data.get("total_price", 0)
 

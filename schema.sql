@@ -134,7 +134,7 @@ INSERT INTO motherboards (name, socket_type, form_factor, gpu_socket, required_w
 ('MSI MPG B650I Edge WiFi', 'AM5', 'ITX', 'PCIe 5.0 x16', 190, 16100);
 -- 14. Insert power supplies (example)
 
--- make it so psu appears after user PS: we be outputting badly
+-- make it so psu appears after calculating user's compont required watts PS: we be outputting badly
 INSERT INTO psus (name, certification, form_factor, watt_output, price) VALUES
 ('Corsair RM750x', '80+ Gold', 'ATX', 750, 7520),
 ('EVGA SuperNOVA 850 G5', '80+ Gold', 'ATX', 850, 9460),
