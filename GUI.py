@@ -223,15 +223,13 @@ with tab1:
             if not preferred_cpu:
              st.warning("please pick CPU")
              
-            user_input = {
-                "preferred_cpu": preferred_cpu,
+            user_input = {               
                 "cpu_model": selected_amd if preferred_cpu == "AMD" else intel_series,
                 "case_size": case_size,
                 "cooling": cooling,
                 "storage": storage,
                 "ram_pref": ram_pref,
-                "gpu_pref": gpu_pref,
-                "psu_pref": psu_pref
+                "gpu_pref": gpu_pref,                
             }
 #-----------------------------code for displaying thec Main Page <End>--------------------------------------------------------
 
