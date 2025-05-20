@@ -24,14 +24,36 @@ class UserComponentInput(BaseModel):
     #needs changing sql
     case_size: str
     #needs changing sql
-    cooling: str
-    #needs changing sql
-    storage: str 
+    cooling: str 
     #frontend changing
     pref_memory_size: str
     pref_storage_size: int
     pref_memory_type: str
     pref_storage_type: str
+
+
+#data validation for build
+class RecommendedBuildForUser(BaseModel):
+    
+     recommended_cpu_name:str
+     recommended_cpu_price: int
+     recommended_gpu_name: str
+     recommended_gpu_price: int   
+     recommended_mobo_name: str
+     recommended_mobo_price: int
+     recommended_psu_name: str
+     recommended_psu_price: int
+     recommended_case_name: str
+     recommended_case_price: int
+     recommended_cooling_name:str
+     recommended_cooling_price: int
+     recommended_storage_name: str
+     recommended_storage_price:int
+     recommended_memory_name: str
+     recommended_memory_price: int
+     recommended_total_cost: int
+
+
 
 #-------------------code thhat interacts with database--------------
 #note we are fetching one build muna so we have to use the function Fetchone instead of fetchall here
@@ -290,6 +312,9 @@ def fetch_memory(pref_memory_type: str, pref_memory_size: str ):
 @app.post("/get_user_build")
 async def get_user_build(input: UserComponentInput):
     try:
+     
+
+
      #getting the data we need from the database to send the recommended build to the user
      cpu = get_cpu(input.cpu_model)   
      cpu_socket = cpu.get("recommended_cpu", {}).get("socket_type")
@@ -304,6 +329,8 @@ async def get_user_build(input: UserComponentInput):
      cooling = fetch_cooling(mobo_socket_type, input.cooling) 
      storage= fetch_storage(input.pref_storage_type,input.pref_storage_size)
      memory= fetch_memory(input.pref_memory_type,input.pref_memory_size)
+     
+
 
      # to get recommended PSU
      cpu_watts=int(cpu.get("recommended_cpu", {}).get("required_watt"))
@@ -316,8 +343,35 @@ async def get_user_build(input: UserComponentInput):
      required_watts= cpu_watts + mobo_watts + gpu_watts + cooling_watts + storage_watts + memory_watts
 
      psu= fetch_psu(required_watts)
-     out = psu
-     return out
+     
+     #to get the name of all the components
+     cpu_name=str(cpu.get("recommended_cpu", {}).get("name"))
+     mobo_name=str(mobo.get("recommended_mobo", {}).get("name"))
+     gpu_name=str(gpu.get("recommended_gpu", {}).get("model"))
+     cooling_name=str(cooling.get("recommended_cooling", {}).get("name"))     
+     psu_name=str(psu.get("recommended_psu", {}).get("name"))
+     case_name=str(ComCase.get("recommended_case", {}).get("name"))
+
+     #need different way of handling it
+     storage_name=str(storage.get("recommended_storage", {}).get("storage_type")) + " " + str(storage.get("recommended_storage", {}).get("capacity")) + " GB Storage"
+     memory_name=str(memory.get("recommended_memory", {}).get("ram_type")) +" "+ str(memory.get("recommended_memory", {}).get("size")) +" Memory"
+
+     #to get price of all components
+
+     cpu_price=cpu.get("recommended_cpu", {}).get("price")
+     mobo_price=mobo.get("recommended_mobo", {}).get("price")
+     gpu_price=gpu.get("recommended_gpu", {}).get("price")
+     cooling_price=cooling.get("recommended_cooling", {}).get("price")
+     storage_price=storage.get("recommended_storage", {}).get("price")
+     memory_price=memory.get("recommended_memory", {}).get("price")
+     psu_price=psu.get("recommended_psu", {}).get("price")
+     case_price=ComCase.get("recommended_case", {}).get("price")
+
+     total_price= cpu_price + mobo_price + gpu_price + cooling_price + storage_price + memory_price + psu_price + case_price
+     
+     build= RecommendedBuildForUser(recommended_cpu_name= cpu_name, recommended_cpu_price= cpu_price, recommended_gpu_name= gpu_name, recommended_gpu_price= gpu_price, recommended_mobo_name=mobo_name, recommended_mobo_price=mobo_price,recommended_psu_name=psu_name,recommended_psu_price=psu_price,recommended_case_name=case_name,recommended_case_price=case_price,recommended_cooling_name=cooling_name,recommended_cooling_price=cooling_price,recommended_storage_name=storage_name, recommended_storage_price=storage_price, recommended_memory_name=memory_name, recommended_memory_price= memory_price, recommended_total_cost=total_price)
+
+     return{"recommended_build":build}
     except Exception as e:
         print(f"Error: {e}")
         import traceback
@@ -478,7 +532,6 @@ def test_mobo_for_cpu(mobo_form_factor:str, pref_size):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
     
-@app.post("/user_build")
 
 #-------------------to test code thhat interacts with database easily end --------------
 

@@ -43,6 +43,8 @@ def display_supporting_components(build, component_prices):
 # Custom CSS for better styling
 st.markdown("""
     <style>
+    .stApp {
+        background-color: black;    
     .stSelectbox, .stRadio, .stSlider {
         margin-bottom: 1rem;
     }
@@ -185,7 +187,7 @@ with tab1:
                 "1TB SSD (Gaming, general use)",
                 "2TB SSD (Content creators)"
                    ]
-        storage = st.radio(
+        storage = st.selectbox(
             "**💾 Storage Configuration**",
             options = storage_values,
              format_func = lambda x: storage_labels[storage_values.index(x)],
@@ -198,8 +200,8 @@ with tab1:
         adv_col1, adv_col2 = st.columns(2)
 
         with adv_col1:
-            ram_values=["8GB","16GB","32GB", "64GB+"]
-            ram_labels=  ["8GB", "16GB", "32GB", "64GB+"]
+            ram_values=["8 GB","16 GB","32 GB", "64 GB"]
+            ram_labels=  ["8 GB", "16 GB", "32 GB", "64 GB"]
             ram_pref = st.selectbox(
                 "Memory Capacity",
                 options = ram_values,
@@ -207,12 +209,7 @@ with tab1:
                 index=0
             )
 
-            gpu_pref = st.radio(
-                "GPU Brand Preference",
-                ["NVIDIA", "AMD"],
-                index=0
-            )
-
+          
             psu_pref = st.selectbox(
                 "Power Supply Certification",
                 ["80+ Bronze", "80+ Gold", "80+ Platinum"],
@@ -238,15 +235,14 @@ with tab1:
                 
                 
                 try:
-                    res = requests.post("http://localhost:8001/user_input", json = user_input)
+                    res = requests.post("http://localhost:8001/get_user_build", json = user_input)
 
                     if res.status_code == 200:
                         data = res.json()
-                        if "input" in data:
+                        if "build" in data:
                             
-                            build = data["input"]
-                            component_prices = data.get("component_prices", {})
-                            total_price = data.get("total_price", 0)
+                            build = data["build"]                           
+                            total_price = data.get("recommended_total_cost", 0)
 
                             st.success("### 🎉 Here's your personalized PC build!")
 
