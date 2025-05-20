@@ -177,7 +177,15 @@ INSERT INTO gpus (brand, model, compatible_sockets, form_factor, required_watt, 
 ('NVIDIA', 'GeForce RTX 5080 Mobile', 'PCIe 5.0 x16', 'Laptop', 80, 95000),
 ('NVIDIA', 'GeForce RTX 5070 Ti Mobile', 'PCIe 5.0 x16', 'Laptop', 60, 85000),
 ('AMD', 'Radeon RX 9070 GRE', 'PCIe 5.0 x16', 'Triple Slot', 260, 125000),
-('NVIDIA', 'GeForce RTX 5090 Laptop', 'PCIe 5.0 x16', 'Laptop', 150, 140000);
+('NVIDIA', 'GeForce RTX 5090 Laptop', 'PCIe 5.0 x16', 'Laptop', 150, 140000),
+('NVIDIA', 'GeForce GTX 1660 Ti', 'PCIe 3.0 x16', 'Dual Slot', 120, 28000),
+('NVIDIA', 'GeForce GTX 1650 Super', 'PCIe 3.0 x16', 'Dual Slot', 100, 18000),
+('AMD', 'Radeon RX 580', 'PCIe 3.0 x16', 'Dual Slot', 185, 15000),
+('AMD', 'Radeon RX 570', 'PCIe 3.0 x16', 'Dual Slot', 150, 13000),
+('NVIDIA', 'GeForce GTX 1080 Ti', 'PCIe 3.0 x16', 'Dual Slot', 250, 40000),
+('NVIDIA', 'GeForce GTX 1070', 'PCIe 3.0 x16', 'Dual Slot', 150, 25000),
+('AMD', 'Radeon RX Vega 64', 'PCIe 3.0 x16', 'Dual Slot', 295, 36000),
+('AMD', 'Radeon RX Vega 56', 'PCIe 3.0 x16', 'Dual Slot', 210, 30000);
 
 INSERT INTO cooling_systems (name, cooling_type, compatible_sockets, required_watt, price) VALUES
 ('Noctua NH-D15', 'Air', 'LGA1700, AM4, AM5', 10, 5580),

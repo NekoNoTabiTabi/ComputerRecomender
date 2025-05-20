@@ -11,30 +11,7 @@ st.set_page_config(
 )
 
 
-#-----------Functions to display components----------------------------------------------------------------------------
-def display_core_components(build, component_prices):
-   
-   st.markdown("#### Core Components")
-   st.markdown(f"""    
-                                    <div class="recommendation-card">
-                                        <p><strong>💻 CPU:</strong> {build.get("CPU", {}).get("name", "No CPU found")} <span class="component-price">₱{component_prices.get('cpu', 0):,.2f}</span></p>
-                                        <p><strong>🎮 GPU:</strong> {build.get("GPU", {}).get("name", "No GPU found")} <span class="component-price">₱{component_prices.get('gpu', 0):,.2f}</span></p>
-                                        <p><strong>🧠 RAM:</strong> {build.get("RAM", {}).get("name", "No RAM found")} <span class="component-price">₱{component_prices.get('ram', 0):,.2f}</span></p>
-                                        <p><strong>💾 Storage:</strong> {build.get('storage')} <span class="component-price">₱{component_prices.get('storage', 0):,.2f}</span></p>
-                                    </div>
-                                """, unsafe_allow_html=True)
 
-def display_supporting_components(build, component_prices):
-  st.markdown("#### Supporting Components")
-  st.markdown(f"""
-                                    <div class="recommendation-card">
-                                        <p><strong>🧩 Motherboard:</strong> {build.get('motherboard')} <span class="component-price">₱{component_prices.get('motherboard', 0):,.2f}</span></p>
-                                        <p><strong>🔌 PSU:</strong> {build.get('psu')} <span class="component-price">₱{component_prices.get('psu', 0):,.2f}</span></p>
-                                        <p><strong>🏢 Case:</strong> {build.get('case')} <span class="component-price">₱{component_prices.get('case', 0):,.2f}</span></p>
-                                        <p><strong>🧊 Cooling:</strong> {build.get('cooling')} <span class="component-price">₱{component_prices.get('cooling', 0):,.2f}</span></p>
-                                    </div>
-                                """, unsafe_allow_html=True)
-#-----------Functions to display components <end>-----------------------------------------------------------------------
 
 
 
@@ -51,16 +28,16 @@ st.markdown("""
     .recommendation-card {
         padding: 1.5rem;
         border-radius: 10px;
-        background-color: #f0f2f6;
+        background-color: #423d3b;
         margin-bottom: 1rem;
     }
     .total-price {
         font-size: 1.5rem;
         font-weight: bold;
-        color: #2e86de;
+        color: #90EE90;
     }
     .component-price {
-        color: #576574;
+        color: #90EE90;
         font-size: 0.9rem;
     }
     .stButton>button {
@@ -74,7 +51,14 @@ st.markdown("""
     .stButton>button:hover {
         background-color: #1e6fd9;
         color: white;
+    } 
+            
+
+    
+    
+   
     }
+    
     </style>
 """, unsafe_allow_html=True)
 
@@ -106,10 +90,10 @@ with tab1:
             amd_values = ["Ryzen 3", "Ryzen 5", "Ryzen 7", "Ryzen 9"]
             
             amd_labels = [
-             "Ryzen 3 (₱15,000 - ₱25,000)",
-             "Ryzen 5 (₱25,000 - ₱45,000)",
-             "Ryzen 7 (₱45,000 - ₱75,000)",
-             "Ryzen 9 (₱75,000 and above)"
+             "Ryzen 3",
+             "Ryzen 5",
+             "Ryzen 7",
+             "Ryzen 9"
                          ]
             st.markdown("""
             **AMD Series Guide:**
@@ -117,12 +101,13 @@ with tab1:
             - **Ryzen 5**: Mainstream (Gaming, productivity)
             - **Ryzen 7**: Performance (Content creation, gaming)
             - **Ryzen 9**: Enthusiast (Workstations, high-end gaming)
+                        
             """)
         elif preferred_cpu == "Intel":
 
             intel_values= ["i3", "i5", "i7","i9"]
 
-            intel_labels=["Intel i3  (₱15,000 - ₱25,000)", "Intel i5 (₱25,000 - ₱45,000)", "Intel i7 (₱45,000 - ₱75,000)", "Intel i9 (₱75,000 and above)"]
+            intel_labels=["Intel i3", "Intel i5", "Intel i7", "Intel i9"]
 
             st.markdown("""
             **Intel Series Guide:**
@@ -130,18 +115,19 @@ with tab1:
             - **i5**: Mainstream (Gaming, multitasking)
             - **i7**: Performance (Content creation, gaming)
             - **i9**: Enthusiast (Workstations, high-end gaming)
+                        
             """)
 
         # Display series selection as multiple choice based on preferred CPU
         if preferred_cpu == "AMD":
-            selected_amd = st.radio(
+            selected_amd = st.selectbox(
              "**:pushpin: Select AMD Series**",
              options=amd_values,
              format_func=lambda x: amd_labels[amd_values.index(x)],
              help="Choose the AMD series you are interested in."
              )
         elif preferred_cpu == "Intel":
-            intel_series = st.radio(
+            intel_series = st.selectbox(
                 "**📌 Select Intel Series**",
              options = intel_values,
              format_func = lambda x: intel_labels[intel_values.index(x)],
@@ -155,7 +141,7 @@ with tab1:
                 "Mid Tower (Balanced size and expandability)",
                 "Full Tower (Maximum expansion, better cooling)",
             ]
-        case_size = st.radio(
+        case_size = st.selectbox(
             
            
             "**📏 Case Size Preference**",
@@ -166,13 +152,13 @@ with tab1:
         )
         
         
-        cooling_values=["Stock", "Air", "Liquid"]
+        cooling_values=[ "Air", "Liquid"]
         cooling_labels= [
-                "Stock Cooler (Included with CPU)",
+           
                 "Air Cooling (Quiet, reliable)",
                 "Liquid Cooling (Better performance, aesthetic)"        
             ]
-        cooling = st.radio(
+        cooling = st.selectbox(
             "**🧊 Cooling Solution**",
              options = cooling_values,
              format_func = lambda x: cooling_labels[cooling_values.index(x)],
@@ -180,41 +166,33 @@ with tab1:
             
             
         )
-        storage_values=["256GB","512GB","1TB","2TB"]
+        storage_values=[256,512,1024,2048, 4096, 8192]
         storage_labels=[             
-                "256GB SSD (Basic use)",
-                "512GB SSD (Moderate use)",
-                "1TB SSD (Gaming, general use)",
-                "2TB SSD (Content creators)"
+                "256 GB",
+                "512 GB",
+                "1024 GB",
+                "2048 GB",
+                "4096 GB",
+                "8192 GB"
                    ]
         storage = st.selectbox(
             "**💾 Storage Configuration**",
             options = storage_values,
              format_func = lambda x: storage_labels[storage_values.index(x)],
              index=0,
-            
+
+        
         )
-
-
-    with st.expander("**⚙️ Advanced Preferences**"):
-        adv_col1, adv_col2 = st.columns(2)
-
-        with adv_col1:
-            ram_values=["8 GB","16 GB","32 GB", "64 GB"]
-            ram_labels=  ["8 GB", "16 GB", "32 GB", "64 GB"]
-            ram_pref = st.selectbox(
-                "Memory Capacity",
+        ram_values=["8 GB","16 GB","32 GB", "64 GB", "128 GB"]
+        ram_labels=  ["8 GB", "16 GB", "32 GB", "64 GB", "128 GB"]
+        ram_pref = st.selectbox(
+                "💿 Memory Capacity",
                 options = ram_values,
                 format_func = lambda x: ram_labels[ram_values.index(x)],              
                 index=0
             )
 
-          
-            psu_pref = st.selectbox(
-                "Power Supply Certification",
-                ["80+ Bronze", "80+ Gold", "80+ Platinum"],
-                index=0
-            )
+    
 
     if st.button("**🎯 Get My PC Recommendation**", use_container_width=True):
             if not preferred_cpu:
@@ -224,10 +202,23 @@ with tab1:
                 "cpu_model": selected_amd if preferred_cpu == "AMD" else intel_series,
                 "case_size": case_size,
                 "cooling": cooling,
-                "storage": storage,
-                "ram_pref": ram_pref,
-                "gpu_pref": gpu_pref,                
+                "pref_storage_size": storage,
+                "pref_memory_size": ram_pref,
+                "pref_storage_type": "SSD",                   
+                "pref_memory_type": "DDR5"          
             }
+
+             #needs changing sql 
+    # cpu_model: str 
+    # #needs changing sql
+    # case_size: str
+    # #needs changing sql
+    # cooling: str 
+    # #frontend changing
+    # pref_memory_size: str
+    # pref_storage_size: int
+    # pref_memory_type: str
+    # pref_storage_type: str
 #-----------------------------code for displaying thec Main Page <End>--------------------------------------------------------
 
 #------------------------------code for displaying the recommended Build------------------------------------------
@@ -242,7 +233,9 @@ with tab1:
                         if "build" in data:
                             
                             build = data["build"]                           
-                            total_price = data.get("recommended_total_cost", 0)
+                            total_price = build.get("recommended_total_cost", 0)
+                            cpu_name = build.get("recommended_cpu_name")
+                            
 
                             st.success("### 🎉 Here's your personalized PC build!")
 
@@ -250,10 +243,26 @@ with tab1:
 
                             with col1:
                                 
-                                display_core_components(build, component_prices)
+                                 st.markdown("#### Core Components")
+                                 st.markdown(f"""    
+                                    <div class="recommendation-card">
+                                        <p><strong>💻 CPU:</strong> {build.get("recommended_cpu_name")} <span class="component-price">₱ {build.get("recommended_cpu_price")}</span></p>
+                                        <p><strong>🎮 GPU:</strong> {build.get("recommended_gpu_name")} <span class="component-price">₱ {build.get("recommended_gpu_price")}</span></p>
+                                        <p><strong>🧠 RAM:</strong> {build.get("recommended_memory_name")} <span class="component-price">₱ {build.get("recommended_memory_price")}</span></p>
+                                        <p><strong>💾 Storage:</strong> {build.get("recommended_storage_name")} <span class="component-price">₱ {build.get("recommended_storage_price")}</span></p>
+                                    </div>
+                                """, unsafe_allow_html=True)
 
                             with col2:                                
-                                display_supporting_components(build, component_prices)
+                                st.markdown("#### Supporting Components")
+                                st.markdown(f"""
+                                    <div class="recommendation-card">
+                                        <p><strong>🧩 Motherboard:</strong> {build.get('recommended_mobo_name')} <span class="component-price">₱ {build.get('recommended_mobo_price')}</span></p>
+                                        <p><strong>🔌 PSU:</strong> {build.get('recommended_psu_name')} <span class="component-price">₱ {build.get('recommended_mobo_price')}</span></p>
+                                        <p><strong>🏢 Case:</strong> {build.get('recommended_case_name')} <span class="component-price">₱ {build.get('recommended_mobo_price')}</span></p>
+                                        <p><strong>🧊 Cooling:</strong> {build.get('recommended_cooling_name')} <span class="component-price">₱ {build.get('recommended_mobo_price')}</span></p>
+                                    </div>
+                                """, unsafe_allow_html=True)
 
                             st.markdown(f"""
                                 <div style="margin-top: 2rem;">

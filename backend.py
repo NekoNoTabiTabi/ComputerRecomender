@@ -371,7 +371,7 @@ async def get_user_build(input: UserComponentInput):
      
      build= RecommendedBuildForUser(recommended_cpu_name= cpu_name, recommended_cpu_price= cpu_price, recommended_gpu_name= gpu_name, recommended_gpu_price= gpu_price, recommended_mobo_name=mobo_name, recommended_mobo_price=mobo_price,recommended_psu_name=psu_name,recommended_psu_price=psu_price,recommended_case_name=case_name,recommended_case_price=case_price,recommended_cooling_name=cooling_name,recommended_cooling_price=cooling_price,recommended_storage_name=storage_name, recommended_storage_price=storage_price, recommended_memory_name=memory_name, recommended_memory_price= memory_price, recommended_total_cost=total_price)
 
-     return{"recommended_build":build}
+     return{"build":build}
     except Exception as e:
         print(f"Error: {e}")
         import traceback
