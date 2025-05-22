@@ -4,7 +4,7 @@ from PIL import Image
 
 # Configure page
 st.set_page_config(
-    page_title="PC Build Recommender",
+    page_title="Tech Tailored PC Recommender",
     page_icon="./LOGO.jpg",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -66,7 +66,7 @@ st.markdown("""
 col1, col2, col3 = st.columns([1, 4, 1])
 
 with col2:
-    st.markdown("<h1 style='font-size: 3rem; text-align: center;'>Tech Tailored PC Builder</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='font-size: 3rem; text-align: center;'>Tech Tailored PC Recommender</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>Build your perfect PC with personalized recommendations</p>", unsafe_allow_html=True)
 
 # Main content in tabs
@@ -166,15 +166,15 @@ with tab1:
             
             
         )
-        storage_values=[256,512,1024,2048, 4096, 8192]
-        storage_labels=[             
-                "256 GB",
-                "512 GB",
-                "1024 GB",
-                "2048 GB",
-                "4096 GB",
-                "8192 GB"
-                   ]
+        storage_values=[256,512,1024,2048,4096,8192]
+        storage_labels=[
+            "256 GB (₱1,200 est.)",
+            "512 GB (₱1,800 est.)",
+            "1 TB (₱2,800 est.)",
+            "2 TB (₱4,500 est.)",
+            "4 TB(₱8,000 est.)",
+            "8 TB (₱15,000 est.)"
+]
         storage = st.selectbox(
             "**💾 Storage Configuration**",
             options = storage_values,
@@ -184,7 +184,13 @@ with tab1:
         
         )
         ram_values=["8 GB","16 GB","32 GB", "64 GB", "128 GB"]
-        ram_labels=  ["8 GB", "16 GB", "32 GB", "64 GB", "128 GB"]
+        ram_labels=[
+            "8 GB (₱3,840 est.)",
+            "16 GB (₱7,250 est.)",
+            "32 GB (₱11,160 est.)",
+            "64 GB (₱19,200 est.)",
+            "128 GB (₱33,480 est.)"
+]
         ram_pref = st.selectbox(
                 "💿 Memory Capacity",
                 options = ram_values,
